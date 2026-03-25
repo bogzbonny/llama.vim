@@ -390,7 +390,7 @@ endfunction
 function! llama#enable()
     " check if current filetype is in disabled_filetypes list
     let l:current_ft = &filetype
-    if index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 && index(g:llama_config.enabled_filetypes, l:current_ft) >= -1
+    if index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 && index(g:llama_config.enabled_filetypes, l:current_ft) == -1
         call llama#debug_log('plugin not enabled for filetype: ' . l:current_ft)
         return
     endif
