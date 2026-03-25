@@ -191,8 +191,8 @@ endfunction
 function! s:check_filetype()
     let l:current_ft = &filetype
 
-    " skip if not in a real buffer
-    if !buflisted(bufnr('%')) || !filereadable(expand('%'))
+    " skip if not in a listed buffer
+    if !buflisted(bufnr('%'))
         return
     endif
 
@@ -378,14 +378,14 @@ function! llama#setup_autocmds()
 endfunction
 
 function! llama#enable()
-    if s:llama_enabled
-        return
-    endif
-
     " check if current filetype is in disable_filetypes list
     let l:current_ft = &filetype
     if index(g:llama_config.disable_filetypes, l:current_ft) >= 0
         call llama#debug_log('plugin not enabled for filetype: ' . l:current_ft)
+        return
+    endif
+
+    if s:llama_enabled
         return
     endif
 
