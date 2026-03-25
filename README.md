@@ -132,7 +132,7 @@ Examples:
     all filetypes, then further only enabled it for specific filetypes. eg:
 
     ```vim
-    let g:llama_config = { 'disabled_filetypes': [''], 'enabled_filetypes': ['rust']  }
+    let g:llama_config = { 'disabled_filetypes': ['*'], 'enabled_filetypes': ['rust']  }
     ```
 
 Please refer to `:help llama_config` or the [source](./autoload/llama.vim)

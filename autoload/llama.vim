@@ -206,9 +206,7 @@ function! s:check_filetype()
 
     if l:is_disabled && !l:is_enabled
         " filetype is disabled, disabled plugin
-            call llama#debug_log('1')
         if s:llama_enabled
-            call llama#debug_log('about to disable')
             call llama#disable()
 
             " now that llama is disabled the autocmd group will not be called
@@ -217,13 +215,10 @@ function! s:check_filetype()
             " NOTE because of this, if the user disables the plugin manually, 
             " This filetype check will not be performed until the user
             " manually re-enables the plugin. 
-            augroup llama_filetype_check
-                autocmd BufEnter * call s:check_filetype()
-            augroup END
+            call llama#setup_filetype_check_autocmds()
         endif
     else
         if !s:llama_enabled
-            call llama#debug_log('about to enable')
             call llama#enable()
         endif
     endif
@@ -233,7 +228,7 @@ function! llama#disable()
     call llama#fim_hide()
 
     autocmd! llama
-    autocmd! llama_filetype_check
+    silent! autocmd! llama_filetype_check
 
     " TODO: these unmaps don't seem to work properly
     if g:llama_config.keymap_fim_trigger != ''
@@ -392,9 +387,12 @@ function! llama#setup_autocmds()
 
         " gather chunk upon saving the file
         autocmd BufWritePost    * call s:pick_chunk(getline(max([1, line('.') - g:llama_config.ring_chunk_size/2]), min([line('.') + g:llama_config.ring_chunk_size/2, line('$')])), v:true, v:true)
+    augroup END
+endfunction
 
-        " check filetype on buffer enter and enable/disable accordingly
-        autocmd BufEnter        * call s:check_filetype()
+function! llama#setup_filetype_check_autocmds()
+    augroup llama
+        autocmd BufEnter * call s:check_filetype()
     augroup END
 endfunction
 
@@ -403,9 +401,7 @@ function! llama#enable()
     let l:current_ft = &filetype
     if index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 && index(g:llama_config.enabled_filetypes, l:current_ft) == -1
         call llama#debug_log('plugin not enabled for filetype: ' . l:current_ft)
-        augroup llama_filetype_check
-            autocmd BufEnter * call s:check_filetype()
-        augroup END
+        call llama#setup_filetype_check_autocmds()
         return
     endif
 
@@ -438,6 +434,7 @@ function! llama#enable()
     endif
 
     call llama#setup_autocmds()
+    call llama#setup_filetype_check_autocmds()
 
     silent! call llama#fim_hide()
 

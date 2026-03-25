@@ -183,7 +183,7 @@ Currently the default config is:
 - {disabled_filetypes}	list of filetypes to disable code completion for
                         (default: []). When the current filetype is in this
                         list, code completion will not be triggered.
-                        NOTE if set to [""] all files will be blanket
+                        NOTE if set to ['*'] all files will be blanket
                         disabled, this is useful for using with
                         enabled_filetypes.
 
