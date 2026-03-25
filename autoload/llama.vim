@@ -214,6 +214,10 @@ function! llama#disable()
 
     autocmd! llama
 
+    " only remove autocmds that are active when plugin is enabled
+    " keep BufEnter for filetype checking so plugin can re-enable
+    autocmd BufEnter        * call s:check_filetype()
+
     " TODO: these unmaps don't seem to work properly
     if g:llama_config.keymap_fim_trigger != ''
         exe "silent! iunmap <buffer> " .. g:llama_config.keymap_fim_trigger
