@@ -201,8 +201,10 @@ function! s:check_filetype()
 
     call llama#debug_log('check_filetype for filetype: ' . l:current_ft)
 
+    let l:is_disabled = index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 || index(g:llama_config.disabled_filetypes, '*') >= 0
+    let l:is_enabled = index(g:llama_config.enabled_filetypes, l:current_ft) >= 0 || index(g:llama_config.enabled_filetypes, '*') >= 0
 
-    if index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 && index(g:llama_config.enabled_filetypes, l:current_ft) == -1
+    if l:is_disabled && !l:is_enabled
         " filetype is disabled, disabled plugin
             call llama#debug_log('1')
         if s:llama_enabled
