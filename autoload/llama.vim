@@ -192,9 +192,9 @@ function! s:check_filetype()
     let l:current_ft = &filetype
 
     " skip if not in a listed buffer
-    if !buflisted(bufnr('%'))
-        return
-    endif
+    "if !buflisted(bufnr('%'))
+    "    return
+    "endif
 
     if index(g:llama_config.disable_filetypes, l:current_ft) >= 0
         " filetype is disabled, ensure plugin is disabled
