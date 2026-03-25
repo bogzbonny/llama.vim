@@ -97,7 +97,7 @@ let s:default_config = {
     \ 'keymap_inst_cancel':     "<Esc>",
     \ 'keymap_debug_toggle':    "<leader>lld",
     \ 'enable_at_startup':      v:true,
-    \ 'disabled_filetypes':      [],
+    \ 'disabled_filetypes':     [],
     \ 'enabled_filetypes':      [],
     \ }
 
@@ -198,6 +198,9 @@ function! s:check_filetype()
     if !buflisted(bufnr('%')) || !filereadable(expand('%'))
         return
     endif
+
+    call llama#debug_log('check_filetype for filetype: ' . l:current_ft)
+
 
     if index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 && index(g:llama_config.enabled_filetypes, l:current_ft) == -1
         " filetype is disabled, disabled plugin
