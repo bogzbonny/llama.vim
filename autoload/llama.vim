@@ -49,6 +49,8 @@ highlight default llama_hl_fim_info guifg=#77ff2f ctermfg=119
 "   ring_scope:       the range around the cursor position (in number of lines) for gathering chunks after FIM
 "   ring_update_ms:   how often to process queued chunks in normal mode
 "
+"   disable_filetypes: list of filetypes to disable code completion (default: [])
+"
 " keymaps parameters (empty string to disable):
 "
 "   keymap_fim_trigger:     keymap to trigger the completion, default: <C-F>
@@ -93,6 +95,7 @@ let s:default_config = {
     \ 'keymap_inst_cancel':     "<Esc>",
     \ 'keymap_debug_toggle':    "<leader>lld",
     \ 'enable_at_startup':      v:true,
+    \ 'disable_filetypes':      [],
     \ }
 
 let llama_config = get(g:, 'llama_config', s:default_config)
@@ -182,6 +185,28 @@ endfunction
 
 function! s:rand(i0, i1) abort
     return a:i0 + rand() % (a:i1 - a:i0 + 1)
+endfunction
+
+" check if current filetype is in disable_filetypes list and enable/disable accordingly
+function! s:check_filetype()
+    let l:current_ft = &filetype
+
+    " skip if not in a real buffer
+    if !buflisted(bufnr('%')) || !filereadable(expand('%'))
+        return
+    endif
+
+    if index(g:llama_config.disable_filetypes, l:current_ft) >= 0
+        " filetype is disabled, ensure plugin is disabled
+        if s:llama_enabled
+            call llama#disable()
+        endif
+    else
+        " filetype is not disabled, ensure plugin is enabled (if not already)
+        if !s:llama_enabled
+            call llama#enable()
+        endif
+    endif
 endfunction
 
 function! llama#disable()
@@ -346,11 +371,21 @@ function! llama#setup_autocmds()
 
         " gather chunk upon saving the file
         autocmd BufWritePost    * call s:pick_chunk(getline(max([1, line('.') - g:llama_config.ring_chunk_size/2]), min([line('.') + g:llama_config.ring_chunk_size/2, line('$')])), v:true, v:true)
+
+        " check filetype on buffer enter and enable/disable accordingly
+        autocmd BufEnter        * call s:check_filetype()
     augroup END
 endfunction
 
 function! llama#enable()
     if s:llama_enabled
+        return
+    endif
+
+    " check if current filetype is in disable_filetypes list
+    let l:current_ft = &filetype
+    if index(g:llama_config.disable_filetypes, l:current_ft) >= 0
+        call llama#debug_log('plugin not enabled for filetype: ' . l:current_ft)
         return
     endif
 
