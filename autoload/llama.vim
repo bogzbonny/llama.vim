@@ -204,7 +204,9 @@ function! s:check_filetype()
 
     if index(g:llama_config.disabled_filetypes, l:current_ft) >= 0 && index(g:llama_config.enabled_filetypes, l:current_ft) == -1
         " filetype is disabled, disabled plugin
+            call llama#debug_log('1')
         if s:llama_enabled
+            call llama#debug_log('about to disable')
             call llama#disable()
 
             " now that llama is disabled the autocmd group will not be called
@@ -219,6 +221,7 @@ function! s:check_filetype()
         endif
     else
         if !s:llama_enabled
+            call llama#debug_log('about to enable')
             call llama#enable()
         endif
     endif
