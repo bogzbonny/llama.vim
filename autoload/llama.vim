@@ -191,23 +191,25 @@ endfunction
 function! s:check_filetype()
     let l:current_ft = &filetype
 
-    "" skip if not in a listed buffer
-    "if !buflisted(bufnr('%'))
-    "    return
-    "endif
-    
     " skip if not in a real buffer
     if !buflisted(bufnr('%')) || !filereadable(expand('%'))
         return
     endif
 
     if index(g:llama_config.disable_filetypes, l:current_ft) >= 0
-        " filetype is disabled, ensure plugin is disabled
+        " filetype is disabled, disabled plugin
         if s:llama_enabled
             call llama#disable()
+
+            " now that llama is disabled the autocmd group will not be called
+            " so we must re-add in the check_filetype autocmd 
+            "
+            " NOTE because of this, if the user disables the plugin manually, 
+            " This filetype check will not be performed until the user
+            " manually re-enables the plugin. 
+            autocmd BufEnter        * call s:check_filetype()
         endif
     else
-        " filetype is not disabled, ensure plugin is enabled (if not already)
         if !s:llama_enabled
             call llama#enable()
         endif
@@ -218,10 +220,6 @@ function! llama#disable()
     call llama#fim_hide()
 
     autocmd! llama
-
-    " only remove autocmds that are active when plugin is enabled
-    " keep BufEnter for filetype checking so plugin can re-enable
-    autocmd BufEnter        * call s:check_filetype()
 
     " TODO: these unmaps don't seem to work properly
     if g:llama_config.keymap_fim_trigger != ''
