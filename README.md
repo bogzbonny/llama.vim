@@ -109,7 +109,7 @@ Examples:
 6. Disable code completion for certain filetypes (e.g., markdown)
 
     ```vim
-    let g:llama_config = { 'disable_filetypes': ['markdown', 'text'] }
+    let g:llama_config = { 'disabled_filetypes': ['markdown', 'text'] }
     ```
 
     Or with lazy.nvim:
@@ -119,14 +119,21 @@ Examples:
         'ggml-org/llama.vim',
         init = function()
             vim.g.llama_config = {
-                disable_filetypes = { 'markdown', 'text'},
+                disabled_filetypes = { 'markdown', 'text'},
             }
         end,
     }
     ```
 
     This will prevent the plugin from enabling when the filetype matches any
-    of the entries in the `disable_filetypes` list.
+    of the entries in the `disabled_filetypes` list. 
+
+    Additionally, using `enabled_filetypes` one can disable code completion for
+    all filetypes, then further only enabled it for specific filetypes. eg:
+
+    ```vim
+    let g:llama_config = { 'disabled_filetypes': [''], 'enabled_filetypes': ['rust']  }
+    ```
 
 Please refer to `:help llama_config` or the [source](./autoload/llama.vim)
 for the full list of options.
